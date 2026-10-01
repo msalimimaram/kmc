@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Nexora CRM Dashboard</title>
+<style>
+  :root{
+    --bg:#eef7f6;
+    --panel:#ffffff;
+    --panel-soft:#f7fbfb;
+    --text:#172331;
+    --muted:#789099;
+    --line:#e3eeee;
+    --mint:#48c7b1;
+    --mint-2:#79d9ca;
+    --mint-3:#d9f4ef;
+    --mint-dark:#159e8e;
+    --shadow:0 10px 32px rgba(36,92,91,.08);
+    --radius:18px;
+    --sidebar:118px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--text);background:
+    radial-gradient(circle at 15% 0%,rgba(255,255,255,.9),transparent 30%),
+    linear-gradient(135deg,#f4fbfa 0%,#edf7f6 55%,#e8f4f3 100%);}
+  button,input,select{font:inherit}
+  button{border:0;background:none;color:inherit;cursor:pointer}
+  .app{min-height:100vh;display:flex}
+  .sidebar{
+    width:var(--sidebar);position:fixed;left:12px;top:12px;bottom:12px;
+    background:rgba(248,252,252,.86);border:1px solid rgba(255,255,255,.92);
+    border-radius:22px;box-shadow:0 12px 36px rgba(37,89,87,.07);
+    backdrop-filter:blur(18px);display:flex;flex-direction:column;align-items:center;padding:18px 10px;z-index:30;
+  }
+  .brand{width:100%;display:flex;flex-direction:column;align-items:center;gap:7px;margin-bottom:17px}
+  .brand-mark{width:32px;height:32px;border-radius:9px;background:linear-gradient(145deg,#7be0d0,#13a795);position:relative;overflow:hidden;box-shadow:0 6px 12px rgba(27,170,150,.16)}
+  .brand-mark:before{content:"";position:absolute;width:16px;height:25px;left:7px;top:3px;background:rgba(255,255,255,.72);border-radius:13px 4px 13px 4px;transform:rotate(30deg)}
+  .brand-name{font-weight:800;font-size:14px;letter-spacing:-.4px}
+  .brand-sub{font-size:8px;line-height:1.15;text-align:center;color:var(--muted)}
+  .nav{width:100%;display:flex;flex-direction:column;gap:5px}
+  .nav button{width:100%;min-height:39px;border-radius:12px;display:flex;align-items:center;justify-content:flex-start;gap:9px;padding:8px 8px;font-size:10px;color:#50656d;transition:.2s}
+  .nav button:hover{background:#e9f6f3;color:#218f82}
+  .nav button.active{background:linear-gradient(180deg,#b7eee3,#a6e7dc);color:#137f73;box-shadow:inset 0 1px rgba(255,255,255,.8)}
+  .nav svg{width:15px;height:15px;stroke-width:1.8;flex:0 0 auto}
+  .side-bottom{margin-top:auto;width:100%;display:flex;flex-direction:column;gap:5px}
+  .side-bottom button{justify-content:center}
+  .main{margin-left:calc(var(--sidebar) + 24px);padding:18px 16px 22px 0;width:calc(100% - var(--sidebar) - 30px);max-width:1320px;margin-right:auto}
+  .topbar{height:48px;display:flex;align-items:center;gap:14px;margin-bottom:12px}
+  .search{height:38px;flex:1;max-width:475px;background:rgba(255,255,255,.72);border:1px solid #e6efef;border-radius:20px;display:flex;align-items:center;padding:0 14px;box-shadow:0 5px 18px rgba(32,86,84,.05)}
+  .search svg{width:15px;color:#7f959b}
+  .search input{border:0;outline:0;background:transparent;width:100%;font-size:11px;color:var(--text);padding-left:8px}
+  .search input::placeholder{color:#9aabaf}
+  .top-spacer{flex:1}
+  .icon-btn{width:38px;height:38px;border:1px solid #e6efef;background:rgba(255,255,255,.74);border-radius:50%;display:grid;place-items:center;position:relative;box-shadow:0 5px 18px rgba(32,86,84,.05)}
+  .icon-btn svg{width:16px;color:#60777d}
+  .badge{position:absolute;right:-1px;top:-2px;min-width:16px;height:16px;border-radius:10px;background:#43bcae;color:white;font-size:9px;display:grid;place-items:center;border:2px solid #f3fbfa}
+  .profile{height:42px;border:1px solid #e7efef;background:rgba(255,255,255,.75);border-radius:21px;padding:4px 7px 4px 5px;display:flex;align-items:center;gap:8px;min-width:134px}
+  .avatar{width:31px;height:31px;border-radius:50%;display:grid;place-items:center;background:#bcece4;color:#16897b;font-weight:800;font-size:10px}
+  .profile-copy{line-height:1.05;text-align:left;flex:1}
+  .profile-copy strong{display:block;font-size:10px}
+  .profile-copy span{font-size:8px;color:var(--muted)}
+  .profile svg{width:13px}
+  .page-head{display:flex;align-items:flex-start;justify-content:space-between;margin:3px 0 14px}
+  .eyebrow{font-size:11px;color:#5d737b;margin-bottom:2px}
+  .page-title{font-size:28px;line-height:1.05;letter-spacing:-1.2px;margin:0;font-weight:850}
+  .page-sub{font-size:10px;color:var(--muted);margin-top:5px}
+  .range{height:38px;border:1px solid #e1eceb;background:rgba(255,255,255,.75);border-radius:14px;display:flex;align-items:center;gap:8px;padding:0 12px;font-size:9px;color:#50646b;box-shadow:0 5px 16px rgba(31,85,83,.04)}
+  .range svg{width:14px}
+  .dashboard-grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:10px}
+  .card{background:rgba(255,255,255,.88);border:1px solid rgba(255,255,255,.98);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+  .metric{grid-column:span 3;padding:14px 15px 12px;min-height:87px;display:flex;align-items:center;gap:11px}
+  .metric-icon{width:40px;height:40px;border-radius:12px;background:#e0f6f2;display:grid;place-items:center;flex:0 0 auto}
+  .metric-icon svg{width:19px;color:#19a491}
+  .metric h3{font-size:16px;letter-spacing:-.4px;margin:0 0 3px}
+  .metric p{font-size:9px;color:#6e8389;margin:0 0 5px}
+  .delta{font-size:8px;color:#3aa796}
+  .delta strong{background:#e2f6f2;border-radius:5px;padding:2px 5px;margin-right:4px}
+  .section{padding:13px 14px}
+  .pipeline,.stages{grid-column:span 6;min-height:190px}
+  .wide-half{grid-column:span 6}
+  .full-half{grid-column:span 6}
+  .section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
+  .section-title{font-weight:750;font-size:11px}
+  .section-action,.select-mini{font-size:8px;color:#63777d;border:1px solid #e7efef;background:#f8fbfb;border-radius:11px;padding:5px 8px}
+  .pipeline-wrap{display:flex;align-items:center;gap:14px;height:150px}
+  .funnel{width:55%;height:142px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:4px}
+  .funnel-row{height:31px;display:flex;align-items:center;justify-content:center;color:#174f4b;font-weight:800;font-size:9px;background:linear-gradient(180deg,#9be6db,#42c7b5);clip-path:polygon(5% 0,95% 0,88% 100%,12% 100%);border-radius:8px}
+  .funnel-row:nth-child(1){width:94%}.funnel-row:nth-child(2){width:78%}.funnel-row:nth-child(3){width:62%}.funnel-row:nth-child(4){width:48%}.funnel-row:nth-child(5){width:37%}
+  .funnel-labels{flex:1;display:flex;flex-direction:column;gap:11px}
+  .funnel-label{display:flex;align-items:center;justify-content:space-between;font-size:9px;color:#65787e}
+  .funnel-label b{color:#283d44;font-size:9px}
+  .bars{height:145px;display:flex;align-items:flex-end;gap:16px;padding:8px 3px 19px}
+  .bar-wrap{height:100%;flex:1;display:flex;align-items:flex-end;justify-content:center;position:relative}
+  .bar{width:100%;max-width:34px;border-radius:7px 7px 2px 2px;background:linear-gradient(180deg,#70d8c8,#4bc6b6);position:relative;min-height:12px;box-shadow:0 5px 12px rgba(56,181,164,.1)}
+  .bar:nth-child(1){background:linear-gradient(180deg,#6ed9c9,#45c4b3)}
+  .bar-value{position:absolute;top:-14px;width:100%;text-align:center;font-size:8px;color:#5b6f76}
+  .bar-label{position:absolute;bottom:-18px;font-size:8px;color:#6d8086;white-space:nowrap}
+  .donut-card,.line-card{min-height:173px}
+  .donut-layout{display:flex;align-items:center;gap:18px;height:132px}
+  .donut{width:110px;height:110px;border-radius:50%;background:conic-gradient(#169e8f 0 38%,#55cfc0 38% 60%,#86ddd2 60% 78%,#b4e9e2 78% 90%,#d8f2ee 90% 100%);position:relative;flex:0 0 auto}
+  .donut:after{content:"";position:absolute;inset:22px;background:#fff;border-radius:50%}
+  .donut-center{position:absolute;inset:0;z-index:1;display:flex;align-items:center;justify-content:center;flex-direction:column;font-size:16px;font-weight:800}
+  .donut-center span{font-size:8px;color:#7c9095;font-weight:500;margin-top:1px}
+  .legend{display:flex;flex-direction:column;gap:7px;flex:1}
+  .legend-row{display:flex;align-items:center;gap:7px;font-size:8px;color:#65797f}
+  .legend-dot{width:9px;height:9px;border-radius:50%;background:#179f90}
+  .legend-row:nth-child(2) .legend-dot{background:#55cfc0}.legend-row:nth-child(3) .legend-dot{background:#86ddd2}.legend-row:nth-child(4) .legend-dot{background:#b4e9e2}.legend-row:nth-child(5) .legend-dot{background:#d8f2ee}
+  .legend-row b{margin-left:auto;color:#30474d}
+  .line-wrap{height:132px;position:relative;padding:3px 5px 2px}
+  .gridline{position:absolute;left:4px;right:3px;height:1px;background:#edf3f2}
+  .gridline.g1{top:16px}.gridline.g2{top:47px}.gridline.g3{top:78px}.gridline.g4{top:109px}
+  .line-svg{position:absolute;inset:5px 6px 18px}
+  .line-labels{position:absolute;left:5px;right:4px;bottom:0;display:flex;justify-content:space-between;color:#71858a;font-size:7px}
+  .task-card,.deal-card{grid-column:span 6;min-height:204px}
+  .task-list{display:flex;flex-direction:column}
+  .task-row{display:grid;grid-template-columns:18px 24px 1fr auto;gap:7px;align-items:center;padding:7px 0;border-top:1px solid #edf3f2}
+  .check{width:15px;height:15px;border:1px solid #a9bdc0;border-radius:50%;display:grid;place-items:center}
+  .check.done{background:#57cbbb;border-color:#57cbbb;color:white}
+  .task-icon{width:24px;height:24px;border-radius:7px;background:#eff8f7;display:grid;place-items:center;color:#5d777d}
+  .task-icon svg{width:12px}
+  .task-text{font-size:9px;line-height:1.25}.task-text span{display:block;color:#7b8e93;font-size:8px;margin-top:2px}
+  .pill{font-size:8px;padding:4px 7px;border-radius:8px;background:#dff5f0;color:#218c7d}.pill.email{background:#e8f0ff;color:#4381cb}.pill.meeting{background:#ece7ff;color:#7155c9}.pill.admin{background:#edf1f1;color:#718083}
+  .table{width:100%;border-collapse:collapse;font-size:8px}
+  .table th{color:#778b90;font-weight:500;text-align:left;padding:4px 5px 6px}
+  .table td{padding:6px 5px;border-top:1px solid #edf3f2;vertical-align:middle}
+  .company{display:flex;align-items:center;gap:7px}
+  .company-logo{width:18px;height:18px;border-radius:50%;display:grid;place-items:center;background:#102b35;color:white;font-size:7px;font-weight:800}
+  .company-logo.b{background:#4796e8}.company-logo.g{background:#63c6a5}.company-logo.n{background:#243743}.company-logo.s{background:#f08072}
+  .stage{font-size:7px;padding:4px 6px;border-radius:7px;background:#ffeacb;color:#bb7a21}.stage.proposal{background:#dbeaff;color:#3981c7}.stage.qualified{background:#dff5ed;color:#2a9b80}.stage.leads{background:#e7f4f0;color:#568e83}
+  .bottom-card{grid-column:span 6;min-height:176px}
+  .team-table{width:100%;border-collapse:collapse;font-size:8px}
+  .team-table th{font-weight:500;color:#74888d;text-align:left;padding:3px 5px 7px}
+  .team-table td{padding:5px;border-top:1px solid #edf3f2}
+  .member{display:flex;align-items:center;gap:6px}.member .avatar{width:22px;height:22px;font-size:7px}
+  .progress{width:82px;height:7px;border-radius:10px;background:#e6f2f0;overflow:hidden}.progress i{display:block;height:100%;background:linear-gradient(90deg,#6bd5c7,#36bba9);border-radius:10px}
+  .activity{display:flex;flex-direction:column}
+  .activity-row{display:grid;grid-template-columns:23px 1fr auto;gap:7px;align-items:center;padding:6px 0;border-top:1px solid #edf3f2;font-size:8px}
+  .activity-icon{width:22px;height:22px;border-radius:7px;background:#e5f7f3;color:#1ca28f;display:grid;place-items:center}.activity-icon svg{width:12px}
+  .activity-time{color:#7b8e93;font-size:7px}
+  .quote{position:fixed;left:12px;bottom:85px;width:118px;padding:12px 10px;background:rgba(249,253,252,.84);border:1px solid rgba(255,255,255,.9);border-radius:16px;box-shadow:0 8px 25px rgba(37,89,87,.06);font-size:9px;line-height:1.35;color:#71868a}
+  .quote:after{content:"";display:block;width:29px;height:2px;background:#49c5b3;margin-top:8px}
+  .popover{position:fixed;right:18px;top:65px;width:220px;background:white;border:1px solid #e3eded;border-radius:14px;box-shadow:0 16px 40px rgba(30,70,68,.14);padding:8px;display:none;z-index:60}
+  .popover.show{display:block}.pop-title{font-weight:750;font-size:10px;padding:7px}.pop-item{padding:8px;border-radius:9px;font-size:9px;color:#5c7077}.pop-item:hover{background:#f0f8f6}
+  .toast{position:fixed;right:18px;bottom:18px;background:#173b3a;color:white;padding:10px 13px;border-radius:11px;font-size:9px;box-shadow:0 12px 30px rgba(0,0,0,.18);opacity:0;transform:translateY(10px);pointer-events:none;transition:.25s;z-index:100}.toast.show{opacity:1;transform:translateY(0)}
+  .mobile-toggle{display:none}
+  .page-panel{grid-column:1/-1;min-height:450px;padding:18px}
+  .page-panel h2{font-size:18px;margin:0 0 5px}.page-panel p{font-size:10px;color:var(--muted)}
+  .mini-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:15px}
+  .mini-box{padding:15px;border:1px solid var(--line);border-radius:14px;background:#fbfefe}.mini-box b{font-size:18px}.mini-box span{display:block;font-size:9px;color:var(--muted);margin-top:4px}
+  @media(max-width:900px){
+    :root{--sidebar:72px}.sidebar{width:72px}.brand-name,.brand-sub,.nav button span,.side-bottom span,.quote{display:none}.nav button{justify-content:center}.main{margin-left:92px;width:calc(100% - 106px)}
+    .metric{grid-column:span 6}.pipeline,.stages,.task-card,.deal-card,.bottom-card,.wide-half,.full-half{grid-column:span 12}
+  }
+  @media(max-width:620px){
+    .sidebar{display:none}.main{margin-left:0;width:100%;padding:12px}.mobile-toggle{display:grid}.topbar{gap:7px}.search{order:2}.mobile-toggle{order:1}.top-spacer{display:none}.profile{min-width:42px;width:42px;padding:4px;justify-content:center}.profile-copy,.profile>svg{display:none}
+    .page-head{gap:10px}.page-title{font-size:22px}.range{font-size:8px}
+    .metric{grid-column:span 12}.mini-grid{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark"></div>
+      <div class="brand-name">Nexora</div>
+      <div class="brand-sub">Relationships<br>Drive Growth</div>
+    </div>
+    <nav class="nav" id="nav"></nav>
+    <div class="quote">Good things<br>happen with<br>great relationships.</div>
+    <div class="side-bottom" id="sideBottom"></div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <button class="icon-btn mobile-toggle" id="mobileMenu" aria-label="Menu">☰</button>
+      <label class="search">
+        <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="6.5" stroke="currentColor"/><path d="m16 16 4 4" stroke="currentColor"/></svg>
+        <input id="searchInput" placeholder="Search leads, contacts, deals..." />
+      </label>
+      <div class="top-spacer"></div>
+      <button class="icon-btn" id="bell"><svg viewBox="0 0 24 24" fill="none"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4" stroke="currentColor" stroke-linecap="round"/></svg><span class="badge">3</span></button>
+      <button class="profile" id="profileBtn"><div class="avatar">JS</div><div class="profile-copy"><strong>Jane Smith</strong><span>Growth Team</span></div><svg viewBox="0 0 24 24" fill="none"><path d="m7 10 5 5 5-5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
+
+    <div class="page-head">
+      <div>
+        <div class="eyebrow">Welcome back, Jane 👋</div>
+        <h1 class="page-title" id="pageTitle">CRM Dashboard</h1>
+        <div class="page-sub" id="pageSub">Turn conversations into lasting relationships.</div>
+      </div>
+      <button class="range" id="rangeBtn"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="17" rx="3" stroke="currentColor"/><path d="M8 2v4M16 2v4M3 9h18" stroke="currentColor"/></svg><span id="rangeText">Jan 1, 2024 – Jan 31, 2024</span><span>⌄</span></button>
+    </div>
+
+    <section class="dashboard-grid" id="content"></section>
+  </main>
+</div>
+
+<div class="popover" id="popover"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const icons = {
+  dashboard:`<svg viewBox="0 0 24 24" fill="none"><path d="M4 11.5 12 5l8 6.5v7a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 18.5v-7Z" stroke="currentColor"/><path d="M9 20v-5h6v5" stroke="currentColor"/></svg>`,
+  leads:`<svg viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3" stroke="currentColor"/><path d="M3.5 19c.7-3 2.7-4.5 5.5-4.5s4.8 1.5 5.5 4.5M16 8.5h5M18.5 6v5" stroke="currentColor" stroke-linecap="round"/></svg>`,
+  contacts:`<svg viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3" stroke="currentColor"/><path d="M3.5 19c.7-3 2.7-4.5 5.5-4.5s4.8 1.5 5.5 4.5M17 6v8M14 9h6" stroke="currentColor" stroke-linecap="round"/></svg>`,
+  deals:`<svg viewBox="0 0 24 24" fill="none"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-linecap="round"/><path d="M7 4v16" stroke="currentColor"/></svg>`,
+  companies:`<svg viewBox="0 0 24 24" fill="none"><path d="M5 21V4h9v17M14 9h5v12M8 8h3M8 12h3M8 16h3M17 13h1M17 17h1" stroke="currentColor" stroke-linecap="round"/></svg>`,
+  tasks:`<svg viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="3" stroke="currentColor"/><path d="m8 12 2.5 2.5L16 9" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  calendar:`<svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="17" rx="3" stroke="currentColor"/><path d="M8 2v4M16 2v4M3 9h18" stroke="currentColor"/></svg>`,
+  reports:`<svg viewBox="0 0 24 24" fill="none"><path d="M5 20V9M12 20V4M19 20v-7" stroke="currentColor" stroke-linecap="round"/><path d="M3 20h18" stroke="currentColor"/></svg>`,
+  automation:`<svg viewBox="0 0 24 24" fill="none"><path d="m13 2-8 12h6l-1 8 8-12h-6l1-8Z" stroke="currentColor" stroke-linejoin="round"/></svg>`,
+  settings:`<svg viewBox="0 0 24 24" fill="none"><path d="M12 8.5A3.5 3.5 0 1 0 12 15.5 3.5 3.5 0 0 0 12 8.5Z" stroke="currentColor"/><path d="m19 13.2 1.1.8-1.5 2.6-1.3-.5a7.4 7.4 0 0 1-2 1.2L15 19h-3l-.3-1.7a7.4 7.4 0 0 1-2-1.2l-1.3.5-1.5-2.6 1.1-.8a7.3 7.3 0 0 1 0-2.4l-1.1-.8 1.5-2.6 1.3.5a7.4 7.4 0 0 1 2-1.2L12 5h3l.3 1.7a7.4 7.4 0 0 1 2 1.2l1.3-.5 1.5 2.6-1.1.8a7.3 7.3 0 0 1 0 2.4Z" stroke="currentColor" stroke-linejoin="round"/></svg>`,
+  help:`<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor"/><path d="M9.7 9a2.4 2.4 0 1 1 4 1.8c-1.4 1-2 1.5-2 3M12 17h.01" stroke="currentColor" stroke-linecap="round"/></svg>`,
+  users:`<svg viewBox="0 0 24 24" fill="none"><circle cx="8" cy="9" r="3" stroke="currentColor"/><circle cx="16.5" cy="8" r="2.5" stroke="currentColor"/><path d="M2.8 19c.7-3.1 2.5-4.6 5.2-4.6S12.5 15.9 13.2 19M14 14.8c2.9-.8 5.8.8 6.6 3.8" stroke="currentColor" stroke-linecap="round"/></svg>`,
+  dollar:`<svg viewBox="0 0 24 24" fill="none"><path d="M12 3v18M16 7.2c-.8-.8-2.1-1.2-3.7-1.2-2.1 0-3.6 1.1-3.6 2.7 0 4.2 7.6 1.8 7.6 6.2 0 1.6-1.4 2.9-3.9 2.9-1.8 0-3.3-.5-4.3-1.5" stroke="currentColor" stroke-linecap="round"/></svg>`,
+  handshake:`<svg viewBox="0 0 24 24" fill="none"><path d="m3 11 4-4 4 2 2-2 8 5-4 5-5-3-3 2-6-5Z" stroke="currentColor" stroke-linejoin="round"/></svg>`,
+  bars:`<svg viewBox="0 0 24 24" fill="none"><path d="M5 20V9M12 20V4M19 20v-7" stroke="currentColor" stroke-linecap="round"/></svg>`
+};
+const navItems=[
+  ['dashboard','Dashboard'],['leads','Leads'],['contacts','Contacts'],['deals','Deals'],['companies','Companies'],
+  ['tasks','Tasks'],['calendar','Calendar'],['reports','Reports'],['automation','Automation']
+];
+const nav=document.getElementById('nav');
+nav.innerHTML=navItems.map(([id,label])=>`<button data-page="${id}" class="${id==='dashboard'?'active':''}">${icons[id]}<span>${label}</span></button>`).join('');
+document.getElementById('sideBottom').innerHTML=`<button data-page="settings">${icons.settings}<span>Settings</span></button><button data-page="help">${icons.help}<span>Help</span></button>`;
+
+const content=document.getElementById('content'), title=document.getElementById('pageTitle'), sub=document.getElementById('pageSub');
+const toast=document.getElementById('toast'), popover=document.getElementById('popover');
+
+function showToast(msg){toast.textContent=msg;toast.classList.add('show');clearTimeout(showToast.t);showToast.t=setTimeout(()=>toast.classList.remove('show'),2200)}
+function setActive(page){
+  document.querySelectorAll('.nav button,.side-bottom button').forEach(b=>b.classList.toggle('active',b.dataset.page===page));
+  renderPage(page);
+}
+document.querySelectorAll('.nav button,.side-bottom button').forEach(b=>b.addEventListener('click',()=>setActive(b.dataset.page)));
+
+const metrics=[
+ ['users','1,248','Total Leads','12%'],
+ ['dollar','$284,320','Total Revenue','18%'],
+ ['handshake','320','Open Deals','6%'],
+ ['bars','72%','Conversion Rate','9%']
+];
+const deals=[
+ ['Acme Corp','$24,000','Negotiation','Jan 28, 2024',''],
+ ['BrightLabs','$18,500','Proposal','Jan 30, 2024','b'],
+ ['GlobalTech','$42,000','Qualified','Feb 5, 2024','g'],
+ ['NovaRetail','$12,000','Leads','Feb 10, 2024','n'],
+ ['Summit Health','$28,000','Negotiation','Feb 12, 2024','s']
+];
+const tasks=[
+ ['Follow up with Acme Corp','Today, 10:00 AM','Call',''],
+ ['Send proposal to BrightLabs','Today, 2:00 PM','Email','email'],
+ ['Demo with GlobalTech','Tomorrow, 11:00 AM','Meeting','meeting'],
+ ['Update deal status in CRM','Tomorrow, 4:00 PM','Admin','admin']
+];
+
+function metricCards(){
+ return metrics.map(m=>`<div class="card metric"><div class="metric-icon">${icons[m[0]]}</div><div><h3>${m[1]}</h3><p>${m[2]}</p><div class="delta"><strong>↑ ${m[3]}</strong> vs. last month</div></div></div>`).join('');
+}
+function pipeline(){
+ const labels=[['1,248','Leads'],['892','Qualified'],['540','Proposal'],['320','Negotiation'],['210','Closed']];
+ return `<div class="card section pipeline"><div class="section-head"><div class="section-title">Sales Pipeline</div><button class="section-action" onclick="showToast('Pipeline view opened')">View All</button></div><div class="pipeline-wrap"><div class="funnel">${labels.map(x=>`<div class="funnel-row">${x[0]}</div>`).join('')}</div><div class="funnel-labels">${labels.map(x=>`<div class="funnel-label"><b>${x[0]}</b><span>${x[1]}</span></div>`).join('')}</div></div></div>`;
+}
+function stages(){
+ const vals=[356,278,165,98,210], labs=['Leads','Qualified','Proposal','Negotiation','Closed'];
+ const max=400;
+ return `<div class="card section stages"><div class="section-head"><div class="section-title">Deals by Stage</div><button class="select-mini" id="stageSelect">This Month⌄</button></div><div class="bars">${vals.map((v,i)=>`<div class="bar-wrap"><div class="bar" style="height:${Math.max(15,v/max*104)}px"><span class="bar-value">${v}</span></div><span class="bar-label">${labs[i]}</span></div>`).join('')}</div></div>`;
+}
+function sources(){
+ return `<div class="card section donut-card wide-half"><div class="section-head"><div class="section-title">Lead Sources</div><button class="select-mini">This Month⌄</button></div><div class="donut-layout"><div class="donut"><div class="donut-center">1,248<span>Total Leads</span></div></div><div class="legend">${[['Website','38%'],['Referrals','22%'],['Social Media','18%'],['Email Campaigns','12%'],['Other','10%']].map(x=>`<div class="legend-row"><i class="legend-dot"></i><span>${x[0]}</span><b>${x[1]}</b></div>`).join('')}</div></div></div>`;
+}
+function lineChart(){
+ const points=[[0,92],[20,82],[40,65],[60,57],[80,38],[100,26]], vals=[32,41,52,58,66,72];
+ const poly=points.map(p=>`${p[0]*1.0+2},${p[1]}`).join(' ');
+ const circles=points.map((p,i)=>`<circle cx="${p[0]+2}" cy="${p[1]}" r="2.7" fill="#32ae9f"/><text x="${p[0]+2}" y="${p[1]-8}" text-anchor="middle" font-size="7" fill="#526a70">${vals[i]}%</text>`).join('');
+ return `<div class="card section line-card full-half"><div class="section-head"><div class="section-title">Conversion Rate</div><button class="select-mini">Last 6 Months⌄</button></div><div class="line-wrap"><div class="gridline g1"></div><div class="gridline g2"></div><div class="gridline g3"></div><div class="gridline g4"></div><svg class="line-svg" viewBox="0 0 108 116" preserveAspectRatio="none"><defs><linearGradient id="fill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#63d2c2" stop-opacity=".28"/><stop offset="1" stop-color="#63d2c2" stop-opacity="0"/></linearGradient></defs><path d="M2 92 L22 82 L42 65 L62 57 L82 38 L102 26 L102 110 L2 110 Z" fill="url(#fill)"/><polyline points="${poly}" fill="none" stroke="#39ad9e" stroke-width="1.6" vector-effect="non-scaling-stroke"/>${circles}</svg><div class="line-labels"><span>Aug</span><span>Sep</span><span>Oct</span><span>Nov</span><span>Dec</span><span>Jan</span></div></div></div>`;
+}
+function taskCard(){
+ return `<div class="card section task-card"><div class="section-head"><div class="section-title">Upcoming Tasks</div><button class="section-action" onclick="showToast('Task list opened')">View All</button></div><div class="task-list">${tasks.map((t,i)=>`<div class="task-row"><button class="check ${i===0?'done':''}" onclick="this.classList.toggle('done');this.innerHTML=this.classList.contains('done')?'✓':''">${i===0?'✓':''}</button><div class="task-icon">${i===1?icons.deals:i===2?icons.calendar:icons.tasks}</div><div class="task-text">${t[0]}<span>${t[1]}</span></div><button class="pill ${t[3]}" onclick="showToast('${t[2]} action selected')">${t[2]}</button></div>`).join('')}</div></div>`;
+}
+function dealCard(){
+ return `<div class="card section deal-card"><div class="section-head"><div class="section-title">Recent Deals</div><button class="section-action" onclick="setActive('deals')">View All</button></div><table class="table"><thead><tr><th>Company</th><th>Value</th><th>Stage</th><th>Close Date</th></tr></thead><tbody>${deals.map(d=>`<tr><td><div class="company"><i class="company-logo ${d[4]}">${d[0][0]}</i>${d[0]}</div></td><td>${d[1]}</td><td><span class="stage ${d[2].toLowerCase()}">${d[2]}</span></td><td>${d[3]}</td></tr>`).join('')}</tbody></table></div>`;
+}
+function teamCard(){
+ const people=[['JS','Jane Smith','320','88','28%','96'],['MT','Marcus Taylor','278','76','27%','85'],['EP','Emily Parker','242','64','26%','72'],['DL','Daniel Lee','186','48','22%','57']];
+ return `<div class="card section bottom-card"><div class="section-head"><div class="section-title">Team Performance</div><button class="select-mini">This Month⌄</button></div><table class="team-table"><thead><tr><th>Member</th><th>Leads</th><th>Deals</th><th>Conversion</th><th></th></tr></thead><tbody>${people.map(p=>`<tr><td><div class="member"><div class="avatar">${p[0]}</div>${p[1]}</div></td><td>${p[2]}</td><td>${p[3]}</td><td>${p[4]}</td><td><div class="progress"><i style="width:${p[5]}%"></i></div></td></tr>`).join('')}</tbody></table></div>`;
+}
+function activityCard(){
+ const rows=[['eye','Acme Corp viewed your proposal','10 minutes ago'],['mail','BrightLabs replied to your email','2 hours ago'],['calendar','GlobalTech booked a demo','4 hours ago'],['download','NovaRetail downloaded a resource','6 hours ago'],['users','Summit Health became a qualified lead','1 day ago']];
+ const iconFor=(x)=>x==='eye'?`<svg viewBox="0 0 24 24" fill="none"><path d="M3 12s3.5-5 9-5 9 5 9 5-3.5 5-9 5-9-5-9-5Z" stroke="currentColor"/><circle cx="12" cy="12" r="2" stroke="currentColor"/></svg>`:x==='mail'?`<svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor"/><path d="m4 7 8 6 8-6" stroke="currentColor"/></svg>`:x==='calendar'?icons.calendar:x==='users'?icons.users:`<svg viewBox="0 0 24 24" fill="none"><path d="M12 3v11M8 10l4 4 4-4M5 18v2h14v-2" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+ return `<div class="card section bottom-card"><div class="section-head"><div class="section-title">Customer Activity</div><button class="section-action" onclick="showToast('Activity feed opened')">View All</button></div><div class="activity">${rows.map(r=>`<div class="activity-row"><div class="activity-icon">${iconFor(r[0])}</div><span>${r[1]}</span><span class="activity-time">${r[2]}</span></div>`).join('')}</div></div>`;
+}
+function dashboard(){
+ title.textContent='CRM Dashboard';sub.textContent='Turn conversations into lasting relationships.';
+ content.innerHTML=metricCards()+pipeline()+stages()+sources()+lineChart()+taskCard()+dealCard()+teamCard()+activityCard();
+}
+function genericPage(page){
+ const names={leads:['Leads','Capture, qualify and nurture every opportunity.'],contacts:['Contacts','Keep every relationship organized in one place.'],deals:['Deals','Track pipeline value, stages and close dates.'],companies:['Companies','Manage accounts and their relationship history.'],tasks:['Tasks','Plan follow-ups and keep the team moving.'],calendar:['Calendar','See meetings, deadlines and activities at a glance.'],reports:['Reports','Turn CRM activity into actionable performance insights.'],automation:['Automation','Create workflows that remove repetitive work.'],settings:['Settings','Configure your workspace, team and preferences.'],help:['Help Center','Find guidance and answers for using Nexora.']};
+ const [t,s]=names[page]||['Nexora','Relationship management workspace'];
+ title.textContent=t;sub.textContent=s;
+ const rows= page==='deals' ? deals : page==='leads' ? [['Acme Corp','Enterprise','Hot','Jane Smith'],['BrightLabs','SaaS','Warm','Marcus Taylor'],['GlobalTech','Technology','Hot','Emily Parker'],['NovaRetail','Retail','Warm','Daniel Lee'],['Summit Health','Healthcare','New','Jane Smith']] :
+ page==='contacts' ? [['Olivia Martin','Acme Corp','VP Sales','olivia@acme.com'],['Noah Chen','BrightLabs','Founder','noah@brightlabs.io'],['Mia Wilson','GlobalTech','Revenue Lead','mia@globaltech.com'],['Liam Brown','NovaRetail','Director','liam@novaretail.com']] :
+ [['This month','1,248','+12%'],['Open pipeline','$284,320','+18%'],['Active relationships','320','+6%']];
+ content.innerHTML=`<div class="card page-panel"><div class="section-head"><div><h2>${t}</h2><p>${s}</p></div><button class="section-action" onclick="showToast('New ${t.slice(0,-1)||t} created')">+ Add New</button></div><div class="mini-grid">${rows.slice(0,3).map((r,i)=>`<div class="mini-box"><b>${r[1]||r[0]}</b><span>${r[2]||r[1]||'Active record'}</span></div>`).join('')}</div><div style="margin-top:18px;border:1px solid var(--line);border-radius:14px;overflow:hidden"><table class="table"><thead><tr>${(rows[0]||[]).map((_,i)=>`<th>Field ${i+1}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div></div>`;
+}
+function renderPage(page){ if(page==='dashboard') dashboard(); else genericPage(page); }
+renderPage('dashboard');
+
+document.getElementById('bell').addEventListener('click',()=>{
+ popover.innerHTML='<div class="pop-title">Notifications</div><div class="pop-item">Acme Corp viewed your proposal</div><div class="pop-item">BrightLabs replied to your email</div><div class="pop-item">New lead assigned to you</div>';
+ popover.classList.toggle('show');
+});
+document.getElementById('profileBtn').addEventListener('click',()=>{
+ popover.innerHTML='<div class="pop-title">Jane Smith</div><div class="pop-item">Profile & account</div><div class="pop-item">Workspace preferences</div><div class="pop-item" onclick="showToast(\'Signed out action selected\')">Sign out</div>';
+ popover.classList.toggle('show');
+});
+document.getElementById('rangeBtn').addEventListener('click',()=>{
+ const ranges=['Jan 1, 2024 – Jan 31, 2024','Feb 1, 2024 – Feb 29, 2024','Last 30 days','This quarter'];
+ const current=document.getElementById('rangeText').textContent;
+ const next=ranges[(ranges.indexOf(current)+1)%ranges.length];
+ document.getElementById('rangeText').textContent=next;showToast('Date range changed');
+});
+document.addEventListener('click',e=>{if(!e.target.closest('#bell')&&!e.target.closest('#profileBtn')&&!e.target.closest('#popover'))popover.classList.remove('show')});
+document.getElementById('searchInput').addEventListener('input',e=>{
+ const q=e.target.value.trim().toLowerCase();
+ if(!q){renderPage(document.querySelector('.nav button.active,.side-bottom button.active')?.dataset.page||'dashboard');return}
+ showToast('Searching: '+q);
+});
+document.getElementById('mobileMenu').addEventListener('click',()=>showToast('Use the sidebar navigation on wider screens'));
+</script>
+</body>
+</html>
